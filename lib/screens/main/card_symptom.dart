@@ -12,10 +12,20 @@ class SymptomCardWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Cимптомы: ${symptom.symptoms.toString()}',
-          style: TextStyle(fontSize: 14),
-        ),
+        Row(
+          children: [
+            Image.asset(
+              'assets/icons/100/mask-100.png',
+              width: 28.0,
+              height: 28.0,
+            ),
+            SizedBox(width: 8.0),
+            Text(
+              'Cимптомы: ${symptom.symptoms.toString()}',
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        )
       ],
     );
   }

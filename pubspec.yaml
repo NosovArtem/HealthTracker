@@ -35,6 +35,16 @@ dependencies:
   intl: ^0.17.0  # Версия intl
   numberpicker: ^2.0.0
   path_provider: ^2.0.2
+  flutter_launcher_icons: ^0.13.1
+
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/launcher/icon.png"
+  image_path_android: "assets/launcher/icon.png"
+#  adaptive_icon_background: "assets/launcher/background.png"
+#  adaptive_icon_foreground: "assets/launcher/foreground.png"
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -57,6 +67,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/icons/48/
+    - assets/icons/100/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

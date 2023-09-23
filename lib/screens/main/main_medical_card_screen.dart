@@ -88,10 +88,14 @@ class MedicalCardScreenState extends State<MedicalCardScreen> {
                 children: [
                   SizedBox(height: 5),
                   record.getCardWidget(),
-                  // Отображение соответствующего контейнера
-                  Text(
-                    record.note.isEmpty ? "" : 'Заметка: ${record.note}',
-                    style: TextStyle(fontSize: 14),
+                  Row(
+                    children: [
+                      SizedBox(width: 35.0),
+                      Text(
+                        record.note.isEmpty ? "" : 'Заметка: ${record.note}',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
                   ),
                   Row(
                     children: [

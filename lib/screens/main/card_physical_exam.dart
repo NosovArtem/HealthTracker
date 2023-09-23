@@ -12,14 +12,34 @@ class PhysicalExamCardWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Рост: ${physicalExam.height}',
-          style: TextStyle(fontSize: 14),
+        Row(
+          children: [
+            Image.asset(
+              'assets/icons/100/height-100.png',
+              width: 28.0,
+              height: 28.0,
+            ),
+            SizedBox(width: 8.0),
+            Text(
+              'Рост: ${physicalExam.height}',
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
         ),
-        Text(
-          'Вес: ${physicalExam.weight}',
-          style: TextStyle(fontSize: 14),
-        )
+        Row(
+          children: [
+            Image.asset(
+              'assets/icons/100/weight-pound-100.png',
+              width: 28.0,
+              height: 28.0,
+            ),
+            SizedBox(width: 8.0),
+            Text(
+              'Вес: ${physicalExam.weight}',
+              style: TextStyle(fontSize: 14),
+            )
+          ],
+        ),
       ],
     );
   }

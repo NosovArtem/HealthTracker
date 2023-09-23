@@ -12,10 +12,20 @@ class VaccineCardWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Вакцина: ${vaccine.name}',
-          style: TextStyle(fontSize: 14),
-        ),
+        Row(
+          children: [
+            Image.asset(
+              'assets/icons/48/syringe-48.png',
+              width: 28.0,
+              height: 28.0,
+            ),
+            SizedBox(width: 8.0),
+            Text(
+              'Вакцина: ${vaccine.name}',
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        )
       ],
     );
   }
