@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:health_tracker/models/lab_test.dart';
+import 'package:health_tracker/model/lab_test.dart';
 
 import '../helper/time_helper.dart';
-import 'date_time_screen.dart';
+import '../widget/date_time.dart';
 
 class LabTestAddScreen extends StatefulWidget {
   final LabTest? initialData;

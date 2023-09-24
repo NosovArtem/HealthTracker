@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:health_tracker/models/vital_info.dart';
+import 'package:health_tracker/model/physical_exam.dart';
 
 import '../helper/time_helper.dart';
-import 'date_time_screen.dart';
+import '../widget/date_time.dart';
 
-class VitalInfoAddOrEditeScreen extends StatefulWidget {
-  final VitalInfo? initialData;
+class PhysicalExamAddOrEditScreen extends StatefulWidget {
+  final PhysicalExam? initialData;
 
-  VitalInfoAddOrEditeScreen({Key? key, this.initialData}) : super(key: key);
+  PhysicalExamAddOrEditScreen({Key? key, this.initialData}) : super(key: key);
 
   @override
-  _VitalInfoAddOrEditeScreenState createState() => _VitalInfoAddOrEditeScreenState();
+  _PhysicalExamAddOrEditScreenState createState() => _PhysicalExamAddOrEditScreenState();
 }
 
-class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
+class _PhysicalExamAddOrEditScreenState extends State<PhysicalExamAddOrEditScreen> {
+  final TextEditingController weightController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+
   final TextEditingController noteController = TextEditingController();
-  final TextEditingController temperatureController = TextEditingController();
-  final TextEditingController heartPulseController = TextEditingController();
-  final TextEditingController bloodPressureController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
   late DateTimePickerWidget dateTimePickerWidget;
@@ -27,9 +27,8 @@ class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
     super.initState();
     if (widget.initialData != null) {
       noteController.text = widget.initialData!.note;
-      temperatureController.text = widget.initialData!.temperature;
-      heartPulseController.text = widget.initialData!.heartPulse;
-      bloodPressureController.text = widget.initialData!.bloodPressure;
+      weightController.text = widget.initialData!.weight;
+      heightController.text = widget.initialData!.height;
 
       DateTime dateTime = widget.initialData?.date ?? DateTime.now();
       dateTimePickerWidget = DateTimePickerWidget(
@@ -42,6 +41,8 @@ class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
 
   @override
   void dispose() {
+    weightController.dispose();
+    heightController.dispose();
     noteController.dispose();
     dateController.dispose();
     timeController.dispose();
@@ -60,19 +61,14 @@ class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
-              controller: temperatureController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(labelText: 'Температура'),
+              controller: weightController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Вес'),
             ),
             TextFormField(
-              controller: heartPulseController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(labelText: 'Пульс'),
-            ),
-            TextFormField(
-              controller: bloodPressureController,
-              keyboardType: TextInputType.datetime,
-              decoration: InputDecoration(labelText: 'Давление'),
+              controller: heightController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Рост'),
             ),
             DateTimePickerWidget(
               initialDate: DateTime.now(),
@@ -89,14 +85,13 @@ class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
                 // Создайте новую запись и передайте ее обратно в основной экран
                 DateTime d = DateTime.parse(dateController.text);
                 TimeOfDay t = parseTimeOfDay(timeController.text);
-                final newRecord = VitalInfo(
+                final newRecord = PhysicalExam(
                   id: widget.initialData?.id ?? -1,
                   userId: widget.initialData?.userId ?? 1,
                   date: DateTime(d.year, d.month, d.day, t.hour, t.minute),
+                  height: heightController.text,
+                  weight: weightController.text,
                   note: noteController.text,
-                  bloodPressure: bloodPressureController.text,
-                  heartPulse: heartPulseController.text,
-                  temperature: temperatureController.text,
                 );
                 Navigator.pop(context, {"old": widget.initialData, "new": newRecord});
               },
@@ -107,4 +102,5 @@ class _VitalInfoAddOrEditeScreenState extends State<VitalInfoAddOrEditeScreen> {
       ),
     );
   }
+
 }

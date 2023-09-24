@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:health_tracker/models/symptom.dart';
+import 'package:health_tracker/model/vaccine.dart';
 
-import 'date_time_screen.dart';
+import '../helper/time_helper.dart';
+import '../widget/date_time.dart';
 
-class SymptomAddOrEditeScreen extends StatefulWidget {
-  final Symptom? initialData;
+class VaccineAddOrEditeScreen extends StatefulWidget {
+  final Vaccine? initialData;
 
-  SymptomAddOrEditeScreen({Key? key, this.initialData}) : super(key: key);
+  VaccineAddOrEditeScreen({Key? key, this.initialData}) : super(key: key);
 
   @override
-  _SymptomAddOrEditeScreenState createState() => _SymptomAddOrEditeScreenState();
+  _VaccineAddOrEditeScreenState createState() => _VaccineAddOrEditeScreenState();
 }
 
-class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
-  final List<String> symptoms = [];
-  final TextEditingController symptomController = TextEditingController();
+class _VaccineAddOrEditeScreenState extends State<VaccineAddOrEditeScreen> {
   final TextEditingController noteController = TextEditingController();
+  final TextEditingController vaccineNameController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
   late DateTimePickerWidget dateTimePickerWidget;
@@ -25,6 +25,7 @@ class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
     super.initState();
     if (widget.initialData != null) {
       noteController.text = widget.initialData!.note;
+      vaccineNameController.text = widget.initialData!.name;
 
       DateTime dateTime = widget.initialData?.date ?? DateTime.now();
       dateTimePickerWidget = DateTimePickerWidget(
@@ -32,34 +33,22 @@ class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
         controllerDate: dateController,
         controllerTime: timeController,
       );
-      //  todo: init symbols
     }
   }
 
   @override
   void dispose() {
-    symptomController.dispose();
+    noteController.dispose();
+    dateController.dispose();
+    timeController.dispose();
     super.dispose();
-  }
-
-  void addTag(String tag) {
-    setState(() {
-      symptoms.add(tag);
-    });
-    symptomController.clear();
-  }
-
-  void removeTag(String tag) {
-    setState(() {
-      symptoms.remove(tag);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Добавление симптомов'),
+        title: Text('Добавить запись'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -67,28 +56,8 @@ class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
-              controller: symptomController,
-              decoration: InputDecoration(labelText: 'Введите симптом'),
-              onFieldSubmitted: (tag) {
-                if (tag.isNotEmpty) {
-                  addTag(tag);
-                }
-              },
-            ),
-            SizedBox(height: 20),
-            Text('Добавленные симптомы:', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 20),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: symptoms.map((tag) {
-                return Chip(
-                  label: Text(tag),
-                  onDeleted: () {
-                    removeTag(tag);
-                  },
-                );
-              }).toList(),
+              controller: vaccineNameController,
+              decoration: InputDecoration(labelText: 'Вакцина'),
             ),
             DateTimePickerWidget(
               initialDate: DateTime.now(),
@@ -99,16 +68,18 @@ class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
               controller: noteController,
               decoration: InputDecoration(labelText: 'Заметка'),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 // Создайте новую запись и передайте ее обратно в основной экран
-                final newRecord = Symptom(
+                DateTime d = DateTime.parse(dateController.text);
+                TimeOfDay t = parseTimeOfDay(timeController.text);
+                final newRecord = Vaccine(
                   id: widget.initialData?.id ?? -1,
                   userId: widget.initialData?.userId ?? 1,
-                  date: DateTime.now(),
-                  symptoms: symptoms,
+                  date: DateTime(d.year, d.month, d.day, t.hour, t.minute),
                   note: noteController.text,
+                  name: vaccineNameController.text,
                 );
                 Navigator.pop(context, {"old": widget.initialData, "new": newRecord});
               },
@@ -119,5 +90,4 @@ class _SymptomAddOrEditeScreenState extends State<SymptomAddOrEditeScreen> {
       ),
     );
   }
-
 }

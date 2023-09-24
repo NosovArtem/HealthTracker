@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
-import '../../models/diagnosis.dart';
+import '../../model/vaccine.dart';
 
-class DiagnosisCardWidget extends StatelessWidget {
-  final Diagnosis diagnosis;
+class VaccineCardWidget extends StatelessWidget {
+  final Vaccine vaccine;
 
-  DiagnosisCardWidget({required this.diagnosis});
+  VaccineCardWidget({required this.vaccine});
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +15,13 @@ class DiagnosisCardWidget extends StatelessWidget {
         Row(
           children: [
             Image.asset(
-              'assets/icons/100/medical-history-100.png',
+              'assets/icons/48/syringe-48.png',
               width: 28.0,
               height: 28.0,
             ),
             SizedBox(width: 8.0),
             Text(
-              'Диагноз: ${diagnosis.name}',
+              'Вакцина: ${vaccine.name}',
               style: TextStyle(fontSize: 14),
             ),
           ],

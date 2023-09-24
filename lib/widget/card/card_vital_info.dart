@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../models/vital_info.dart';
+import '../../model/vital_info.dart';
 
 class VitalInfoCardWidget extends StatelessWidget {
   final VitalInfo vitalInfo;

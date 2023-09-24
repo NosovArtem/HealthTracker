@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:health_tracker/helper/db_helper.dart';
-import 'package:health_tracker/models/physical_exam.dart';
-import 'package:health_tracker/models/symptom.dart';
-import 'package:health_tracker/models/vaccine.dart';
-import 'package:health_tracker/models/vital_info.dart';
+import 'package:health_tracker/model/physical_exam.dart';
+import 'package:health_tracker/model/symptom.dart';
+import 'package:health_tracker/model/vaccine.dart';
+import 'package:health_tracker/model/vital_info.dart';
 
 import 'diagnosis.dart';
 import 'lab_test.dart';
@@ -49,7 +49,6 @@ abstract class MedicalRecord {
     return baseRecordMap;
   }
 
-
   factory MedicalRecord.fromMap(Map<String, dynamic> map) {
     final String recordType = map['type'];
 
@@ -71,8 +70,14 @@ abstract class MedicalRecord {
     }
   }
 
-
   Widget getCardWidget();
+
   StatefulWidget getEditScreenWidget();
 
+  contains(String filterCondition) {
+    if (filterCondition.isEmpty || filterCondition == 'all') {
+      return true;
+    }
+    return type.name.contains(filterCondition);
+  }
 }

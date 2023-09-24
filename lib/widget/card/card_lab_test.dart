@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../models/lab_test.dart';
+import '../../model/lab_test.dart';
 
 class LabTestCardWidget extends StatelessWidget {
   final LabTest labTest;

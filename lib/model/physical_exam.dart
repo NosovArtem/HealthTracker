@@ -1,9 +1,9 @@
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:health_tracker/models/medical_record.dart';
-import 'package:health_tracker/screens/add_physical_exam_screen.dart';
-import 'package:health_tracker/screens/main/card_physical_exam.dart';
+import 'package:health_tracker/model/medical_record.dart';
+import 'package:health_tracker/screen/add_physical_exam_screen.dart';
 
 import '../helper/db_helper.dart';
+import '../widget/card/card_physical_exam.dart';
 
 class PhysicalExam extends MedicalRecord {
   final String height;

@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/medical_record.dart';
+import '../model/medical_record.dart';
 
 class DatabaseHelper {
   static const databaseName = "MedicalCards2.db";
@@ -222,11 +224,10 @@ class DatabaseHelper {
 
   // --------------------------------------------------------
 
-  Future<void> exportDatabase() async {
+  Future<void> backup(String path) async {
     try {
-      // Получите путь к каталогу приложения для документов
+      Fluttertoast.showToast(msg: 'Экспорт базы данных начат...');
       Directory appDocDir = await getApplicationDocumentsDirectory();
-      Directory? downloadDir = await getDownloadsDirectory();
       String dbPath = join(appDocDir.path,
           join(await getDatabasesPath(), DatabaseHelper.databaseName));
 
@@ -235,9 +236,8 @@ class DatabaseHelper {
       List<Map<String, dynamic>> tables = await database
           .rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
 
-      File dumpFile = File(join(
-          downloadDir != null ? downloadDir.path : appDocDir.path,
-          'database_dump.txt'));
+      File dumpFile = File(
+          join(path, '${DateTime.now().toIso8601String()}_database_dump.txt'));
 
       IOSink sink = dumpFile.openWrite();
 
@@ -254,14 +254,18 @@ class DatabaseHelper {
       await sink.close();
       await database.close();
 
-      print('База данных успешно выгружена в ${dumpFile.path}');
+      Fluttertoast.showToast(
+          msg: 'База данных успешно выгружена в ${dumpFile.path}');
     } catch (e) {
-      print('Ошибка при выгрузке базы данных: $e');
+      Fluttertoast.showToast(
+          msg: 'Ошибка при выгрузке базы данных: $e',
+          backgroundColor: Colors.red);
     }
   }
 
-  Future<void> importDatabase() async {
+  Future<void> restore(String path) async {
     try {
+      Fluttertoast.showToast(msg: 'Импорт базы данных начат...');
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String dumpFilePath =
           join(appDocDir.path, 'database_dump.txt'); // Путь к файлу с дампом
@@ -285,9 +289,10 @@ class DatabaseHelper {
 
       await database.close();
 
-      print('База данных успешно импортирована из файла $dumpFilePath');
+      Fluttertoast.showToast(msg: 'Импорт базы данных завершен успешно');
     } catch (e) {
-      print('Ошибка при импорте базы данных: $e');
+      Fluttertoast.showToast(
+          msg: 'Произошла ошибка: $e', backgroundColor: Colors.red);
     }
   }
 }

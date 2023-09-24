@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../models/physical_exam.dart';
+import '../../model/physical_exam.dart';
 
 class PhysicalExamCardWidget extends StatelessWidget {
   final PhysicalExam physicalExam;

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-import '../../models/symptom.dart';
+import '../../model/symptom.dart';
 
 class SymptomCardWidget extends StatelessWidget {
   final Symptom symptom;

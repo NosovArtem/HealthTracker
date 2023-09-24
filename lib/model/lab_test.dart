@@ -1,23 +1,25 @@
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:health_tracker/models/medical_record.dart';
-import 'package:health_tracker/screens/add_vaccine_screen.dart';
-import 'package:health_tracker/screens/main/card_vaccine.dart';
+import 'package:health_tracker/model/medical_record.dart';
+import 'package:health_tracker/screen/add_lab_test_screen.dart';
+import 'package:health_tracker/widget/card/card_lab_test.dart';
 
 import '../helper/db_helper.dart';
 
-class Vaccine extends MedicalRecord {
-  final String name;
+class LabTest extends MedicalRecord {
+  final String testName;
+  final String result;
 
-  Vaccine({
+  LabTest({
     required int id,
     required int userId,
     required DateTime date,
     required String note,
-    required this.name,
+    required this.testName,
+    required this.result,
   }) : super(
           id: id,
           userId: userId,
-          type: RecordType.vaccine,
+          type: RecordType.labTest,
           date: date,
           note: note,
         );
@@ -26,27 +28,29 @@ class Vaccine extends MedicalRecord {
   Map<String, dynamic> toMapAdditionalPart(int recordId) {
     return {
       DatabaseHelper.recordsColumnId: recordId,
-      DatabaseHelper.vaccinesColumnName: name,
+      DatabaseHelper.labTestsColumnTestName: testName,
+      DatabaseHelper.labTestsColumnResult: result,
     };
   }
 
-  factory Vaccine.fromMap(Map<String, dynamic> map) {
-    return Vaccine(
+  factory LabTest.fromMap(Map<String, dynamic> map) {
+    return LabTest(
       id: map[DatabaseHelper.recordsColumnId],
       userId: map[DatabaseHelper.recordsColumnUserId],
       date: DateTime.parse(map[DatabaseHelper.recordsColumnDate]),
       note: map[DatabaseHelper.recordsColumnNote],
-      name: map[DatabaseHelper.vaccinesColumnName],
+      testName: map[DatabaseHelper.labTestsColumnTestName],
+      result: map[DatabaseHelper.labTestsColumnResult],
     );
   }
 
   @override
   Widget getCardWidget() {
-    return VaccineCardWidget(vaccine: this);
+    return LabTestCardWidget(labTest: this);
   }
 
   @override
   StatefulWidget getEditScreenWidget() {
-    return VaccineAddOrEditeScreen(initialData: this);
+    return LabTestAddScreen(initialData: this);
   }
 }
