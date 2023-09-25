@@ -2,8 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:share/share.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../model/medical_record.dart';
@@ -224,75 +227,65 @@ class DatabaseHelper {
 
   // --------------------------------------------------------
 
-  Future<void> backup(String path) async {
+  Future<void> backup(String destinationPath) async {
+    Fluttertoast.showToast(msg: 'Экспорт базы данных начат...');
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String sourcePath = join(appDocDir.path,
+        join(await getDatabasesPath(), DatabaseHelper.databaseName));
+
     try {
-      Fluttertoast.showToast(msg: 'Экспорт базы данных начат...');
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String dbPath = join(appDocDir.path,
-          join(await getDatabasesPath(), DatabaseHelper.databaseName));
-
-      Database database = await openDatabase(dbPath);
-
-      List<Map<String, dynamic>> tables = await database
-          .rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
-
-      File dumpFile = File(
-          join(path, '${DateTime.now().toIso8601String()}_database_dump.txt'));
-
-      IOSink sink = dumpFile.openWrite();
-
-      for (Map<String, dynamic> table in tables) {
-        String tableName = table['name'];
-        String query = "SELECT * FROM $tableName";
-        List<Map<String, dynamic>> queryResult = await database.rawQuery(query);
-
-        sink.write("Table: $tableName\n");
-        sink.write(queryResult.toString());
-        sink.write("\n\n");
+      await _database?.close();
+      final destinationDirectory = Directory(destinationPath);
+      if (!destinationDirectory.existsSync()) {
+        destinationDirectory.createSync(recursive: true);
       }
+      requestPermissions();
+      DateTime now = DateTime.now();
+      String formattedDateTime = DateFormat('yyyy_MM_dd_HH_mm').format(now);
+      final sourceFile = File(sourcePath);
+      final destinationFile = File(
+          join(destinationPath, '${formattedDateTime}_backup_database.db'));
+      await sourceFile.copy(destinationFile.path);
 
-      await sink.close();
-      await database.close();
-
-      Fluttertoast.showToast(
-          msg: 'База данных успешно выгружена в ${dumpFile.path}');
+      shareFile(destinationFile.path);
+      await _initDatabase();
+      print(
+          'Резервная копия базы данных успешно сохранена в: ${destinationFile.path}');
     } catch (e) {
       Fluttertoast.showToast(
-          msg: 'Ошибка при выгрузке базы данных: $e',
+          msg: 'Ошибка при создании резервной копии базы данных: $e',
           backgroundColor: Colors.red);
+      print('Ошибка при создании резервной копии базы данных: $e');
     }
   }
 
-  Future<void> restore(String path) async {
-    try {
-      Fluttertoast.showToast(msg: 'Импорт базы данных начат...');
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String dumpFilePath =
-          join(appDocDir.path, 'database_dump.txt'); // Путь к файлу с дампом
+  void shareFile(String filePath) {
+    Share.shareFiles([filePath], text: 'Поделиться файлом');
+  }
 
-      File dumpFile = File(dumpFilePath);
-      String dumpContent = await dumpFile.readAsString();
+  Future<void> requestPermissions() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+  }
 
-      String dbPath = join(appDocDir.path,
-          join(await getDatabasesPath(), DatabaseHelper.databaseName));
+  Future<void> restore(String dumpFilePath) async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String databasePath = join(appDocDir.path,
+        join(await getDatabasesPath(), DatabaseHelper.databaseName));
 
-      Database database = await openDatabase(dbPath);
+    final backupFile = File(dumpFilePath);
+    await backupFile.copy(databasePath);
 
-      List<String> queries = dumpContent.split(';');
-
-      for (String query in queries) {
-        query = query.trim();
-        if (query.isNotEmpty) {
-          await database.execute(query);
-        }
-      }
-
-      await database.close();
-
-      Fluttertoast.showToast(msg: 'Импорт базы данных завершен успешно');
-    } catch (e) {
+    final newDatabaseFile = File(databasePath);
+    if (await newDatabaseFile.exists()) {
       Fluttertoast.showToast(
-          msg: 'Произошла ошибка: $e', backgroundColor: Colors.red);
+          msg: 'База данных успешно восстановлена из бэкапа.');
+    } else {
+      Fluttertoast.showToast(
+          msg: 'Ошибка восстановления базы данных из бэкапа.',
+          backgroundColor: Colors.red);
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../helper/db_helper.dart';
 
@@ -12,28 +13,69 @@ class BackupScreen extends StatefulWidget {
 class _BackupScreenState extends State<BackupScreen> {
   final dbHelper = DatabaseHelper.instance;
 
-  _backup() async {
-    try {
-      final result = await FilePicker.platform.getDirectoryPath();
-      if (result != null) {
-        dbHelper.backup(result);
-      } else {
-        Fluttertoast.showToast(
-            msg: 'Выбор папки отменен', backgroundColor: Colors.yellow);
-      }
-    } catch (e) {
-      Fluttertoast.showToast(msg: 'Ошибка: $e', backgroundColor: Colors.red);
+  Future<void> _backup() async {
+    final directoryPath = await getInternalAppDirectory();
+    if (directoryPath != null) {
+      await dbHelper.backup(directoryPath);
     }
   }
 
   _restore() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      PlatformFile file = result.files.first;
-      dbHelper.restore(file.path!);
-    } else {
+    final dumpFilePath = await chooseDumpFile();
+    if (dumpFilePath != null) {
+      await dbHelper.restore(dumpFilePath);
+    }
+  }
+
+  Future<String?> getInternalAppDirectory() async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      return appDir.path;
+    } catch (e) {
+      print('Ошибка при получении внутренней папки: $e');
+      return null;
+    }
+  }
+
+  Future<String?> chooseDir() async {
+    try {
+      final String? directoryPath =
+          await FilePicker.platform.getDirectoryPath();
+      if (directoryPath != null) {
+        return directoryPath;
+      } else {
+        Fluttertoast.showToast(
+            msg: 'Выбор папки отменен', backgroundColor: Colors.yellow);
+        return null;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Ошибка: $e', backgroundColor: Colors.red);
+      return null;
+    }
+  }
+
+  Future<String?> chooseDumpFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles();
+
+      if (result != null && result.files.isNotEmpty) {
+        if (!result.isSinglePick) {
+          Fluttertoast.showToast(
+              msg: 'Выбор файла отменен, необходимо выбрать строго 1 файл',
+              backgroundColor: Colors.yellow);
+          return null;
+        }
+        final filePath = result.files.first.path;
+        return filePath;
+      } else {
+        Fluttertoast.showToast(
+            msg: 'Выбор файла отменен', backgroundColor: Colors.yellow);
+        return null;
+      }
+    } catch (e) {
       Fluttertoast.showToast(
-          msg: 'Выбор файла отменен', backgroundColor: Colors.yellow);
+          msg: 'Ошибка выбора файла:: $e', backgroundColor: Colors.red);
+      return null;
     }
   }
 
@@ -95,7 +137,7 @@ class _BackupScreenState extends State<BackupScreen> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
