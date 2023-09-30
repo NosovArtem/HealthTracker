@@ -80,7 +80,7 @@ class _DiagnosisAddOrEditScreenState extends State<DiagnosisAddOrEditScreen> {
                 );
                 Navigator.pop(context, {"old": widget.initialData, "new": newRecord});
               },
-              child: Text('Добавить'),
+              child: Text('Сохранить'),
             ),
           ],
         ),

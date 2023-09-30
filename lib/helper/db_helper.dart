@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:share/share.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -227,7 +226,7 @@ class DatabaseHelper {
 
   // --------------------------------------------------------
 
-  Future<void> backup(String destinationPath) async {
+  Future<void> backup() async {
     Fluttertoast.showToast(msg: 'Экспорт базы данных начат...');
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String sourcePath = join(appDocDir.path,
@@ -235,19 +234,16 @@ class DatabaseHelper {
 
     try {
       await _database?.close();
-      final destinationDirectory = Directory(destinationPath);
-      if (!destinationDirectory.existsSync()) {
-        destinationDirectory.createSync(recursive: true);
-      }
-      requestPermissions();
+      final destination = await getTemporaryDirectory();
+
       DateTime now = DateTime.now();
       String formattedDateTime = DateFormat('yyyy_MM_dd_HH_mm').format(now);
       final sourceFile = File(sourcePath);
       final destinationFile = File(
-          join(destinationPath, '${formattedDateTime}_backup_database.db'));
+          join(destination.path, '${formattedDateTime}_backup_database.db'));
       await sourceFile.copy(destinationFile.path);
 
-      shareFile(destinationFile.path);
+      Share.shareFiles([destinationFile.path], text: 'Поделиться файлом');
       await _initDatabase();
       print(
           'Резервная копия базы данных успешно сохранена в: ${destinationFile.path}');
@@ -256,17 +252,6 @@ class DatabaseHelper {
           msg: 'Ошибка при создании резервной копии базы данных: $e',
           backgroundColor: Colors.red);
       print('Ошибка при создании резервной копии базы данных: $e');
-    }
-  }
-
-  void shareFile(String filePath) {
-    Share.shareFiles([filePath], text: 'Поделиться файлом');
-  }
-
-  Future<void> requestPermissions() async {
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
     }
   }
 

@@ -51,7 +51,9 @@ class _LabTestAddOrEditeScreenState extends State<LabTestAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Добавить запись'),
+        title: Text(widget.initialData != null
+            ? 'Редактировать запись'
+            : 'Добавить запись'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -91,7 +93,7 @@ class _LabTestAddOrEditeScreenState extends State<LabTestAddScreen> {
                 );
                 Navigator.pop(context, {"old": widget.initialData, "new": newRecord});
               },
-              child: Text('Добавить'),
+              child: Text('Сохранить'),
             ),
           ],
         ),

@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../helper/db_helper.dart';
-import '../helper/utils.dart';
+import '../helper/pdf.dart';
 
-class BackupScreen extends StatefulWidget {
+class ExportScreen extends StatefulWidget {
   @override
-  _BackupScreenState createState() => _BackupScreenState();
+  _ExportScreenState createState() => _ExportScreenState();
 }
 
-class _BackupScreenState extends State<BackupScreen> {
+class _ExportScreenState extends State<ExportScreen> {
   final dbHelper = DatabaseHelper.instance;
 
-  Future<void> _backup() async {
-    await dbHelper.backup();
-  }
-
-  _restore() async {
-    final dumpFilePath = await chooseFile();
-    if (dumpFilePath != null) {
-      await dbHelper.restore(dumpFilePath);
-    }
+  Future<void> _export() async {
+    final records = await dbHelper.getAllRecords();
+    await generatePDF(records);
   }
 
   @override
@@ -31,7 +25,7 @@ class _BackupScreenState extends State<BackupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Backup'),
+        title: Text('Export'),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -45,32 +39,13 @@ class _BackupScreenState extends State<BackupScreen> {
                   child: Column(
                     children: [
                       ElevatedButton(
-                        onPressed: _restore,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.restore),
-                            Text(
-                              'Restore',
-                              style: TextStyle(fontSize: 20.0),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SafeArea(
-                  child: Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: _backup,
+                        onPressed: _export,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Icon(Icons.backup),
                             Text(
-                              'Backup',
+                              'Export',
                               style: TextStyle(fontSize: 20.0),
                             ),
                           ],

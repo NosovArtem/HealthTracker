@@ -8,9 +8,17 @@ import 'package:health_tracker/screen/add_vital_info_screen.dart';
 import 'package:intl/intl.dart';
 
 import '../helper/db_helper.dart';
-import '../main.dart';
 import 'add_physical_exam_screen.dart';
 import 'add_symptom_screen.dart';
+
+class MedicalCardScreen extends StatefulWidget {
+  final BuildContext context;
+
+  MedicalCardScreen(this.context);
+
+  @override
+  MedicalCardScreenState createState() => MedicalCardScreenState();
+}
 
 class MedicalCardScreenState extends State<MedicalCardScreen> {
   final dbHelper = DatabaseHelper.instance;
@@ -21,7 +29,8 @@ class MedicalCardScreenState extends State<MedicalCardScreen> {
   @override
   void initState() {
     super.initState();
-    String? argument = ModalRoute.of(widget.context)!.settings.arguments as String?;
+    String? argument =
+        ModalRoute.of(widget.context)!.settings.arguments as String?;
     filterData = argument ?? 'all';
     _loadMedicalRecords();
   }
@@ -29,12 +38,12 @@ class MedicalCardScreenState extends State<MedicalCardScreen> {
   Future<void> _loadMedicalRecords() async {
     final records = await dbHelper.getAllRecords();
     setState(() {
-      medicalRecords = _filter(records);
+      medicalRecords = filter(records, filterData);
       medicalRecords.sort((a, b) => b.date.compareTo(a.date));
     });
   }
 
-  _filter(List<MedicalRecord> data) {
+  filter(List<MedicalRecord> data, String filterData) {
     return data.where((item) => item.contains(filterData)).toList();
   }
 

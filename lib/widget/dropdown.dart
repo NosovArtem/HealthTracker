@@ -34,6 +34,8 @@ class _DropdownState extends State<Dropdown> {
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       value: selectedOption,
+      alignment: Alignment.center,
+      icon: Icon(Icons.filter_alt_outlined),
       onChanged: (String? newValue) {
         setState(() {
           selectedOption = newValue!;
@@ -44,6 +46,7 @@ class _DropdownState extends State<Dropdown> {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
+          alignment: Alignment.center,
         );
       }).toList(),
     );
